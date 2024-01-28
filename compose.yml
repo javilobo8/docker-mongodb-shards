@@ -1,12 +1,24 @@
 version: '3.8'
 
 services:
+  mongodb-config-1:
+    container_name: mongodb-config-1
+    image: mongo:$MONGODB_VERSION
+    command: mongod --configsvr --replSet $CONFIG_RS_NAME --dbpath /data/db --port 27017
+    ports:
+      - $CONFIG_RS_1_PORT:27017
+    volumes:
+      - ./data/config-1:/data/db
+
   mongodb-router-1:
     container_name: mongodb-router-1
     image: mongo:$MONGODB_VERSION
     command: mongos --configdb $CONFIG_RS_NAME/$CONFIG_RS_1_IP:$CONFIG_RS_1_PORT --port 27017 --bind_ip_all
+    depends_on:
+      - mongodb-config-1
     ports:
       - 30000:27017
+
   mongodb-shard-1:
     container_name: mongodb-shard-1
     image: mongo:$MONGODB_VERSION
@@ -15,6 +27,7 @@ services:
       - $SHARD_PORT_1:27017
     volumes:
       - ./data/shard-1:/data/db
+
   mongodb-shard-2:
     container_name: mongodb-shard-2
     image: mongo:$MONGODB_VERSION
