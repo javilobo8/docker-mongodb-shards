@@ -1,4 +1,4 @@
-# Steps
+# MongoDB Cluster with Docker Compose
 
 A simple mongodb cluster with 1 config server, 2 shard servers and 1 router.
 
