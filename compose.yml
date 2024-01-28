@@ -4,35 +4,40 @@ services:
   mongodb-config-1:
     container_name: mongodb-config-1
     image: mongo:$MONGODB_VERSION
-    command: mongod --configsvr --replSet $CONFIG_RS_NAME --dbpath /data/db --port 27017
+    command: mongod --configsvr --replSet $CONFIG_RS_NAME --dbpath /data/db --port 27017 --keyFile /srv/mongodb/replica-keyfile
     ports:
       - $CONFIG_RS_1_PORT:27017
     volumes:
+      - ./data/replica-keyfile:/srv/mongodb/replica-keyfile
       - ./data/config-1:/data/db
 
   mongodb-router-1:
     container_name: mongodb-router-1
     image: mongo:$MONGODB_VERSION
-    command: mongos --configdb $CONFIG_RS_NAME/$CONFIG_RS_1_IP:$CONFIG_RS_1_PORT --port 27017 --bind_ip_all
+    command: mongos --configdb $CONFIG_RS_NAME/$CONFIG_RS_1_IP:$CONFIG_RS_1_PORT --port 27017 --bind_ip_all --keyFile /srv/mongodb/replica-keyfile
     depends_on:
       - mongodb-config-1
     ports:
       - 30000:27017
+    volumes:
+      - ./data/replica-keyfile:/srv/mongodb/replica-keyfile
 
   mongodb-shard-1:
     container_name: mongodb-shard-1
     image: mongo:$MONGODB_VERSION
-    command: mongod --shardsvr --replSet $SHARD_NAME_1 --dbpath /data/db --port 27017
+    command: mongod --shardsvr --replSet $SHARD_NAME_1 --dbpath /data/db --port 27017 --keyFile /srv/mongodb/replica-keyfile
     ports:
       - $SHARD_PORT_1:27017
     volumes:
+      - ./data/replica-keyfile:/srv/mongodb/replica-keyfile
       - ./data/shard-1:/data/db
 
   mongodb-shard-2:
     container_name: mongodb-shard-2
     image: mongo:$MONGODB_VERSION
-    command: mongod --shardsvr --replSet $SHARD_NAME_2 --dbpath /data/db --port 27017
+    command: mongod --shardsvr --replSet $SHARD_NAME_2 --dbpath /data/db --port 27017 --keyFile /srv/mongodb/replica-keyfile
     ports:
       - $SHARD_PORT_2:27017
     volumes:
+      - ./data/replica-keyfile:/srv/mongodb/replica-keyfile
       - ./data/shard-2:/data/db

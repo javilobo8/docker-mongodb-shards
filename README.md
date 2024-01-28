@@ -2,6 +2,11 @@
 
 A simple mongodb cluster with 1 config server, 2 shard servers and 1 router.
 
+```bash
+openssl rand -base64 741 > ./data/replica-keyfile
+chmod 600 ./data/replica-keyfile
+```
+
 ```javascript
 // on mongodb-config
 rs.initiate({
